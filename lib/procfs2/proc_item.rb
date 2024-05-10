@@ -2,7 +2,7 @@
 
 module Procfs2
   class ProcItem
-    attr_reader :_parent, :_raw_content, :_data
+    attr_reader :_parent, :_data
 
     def initialize(parent:)
       @_parent = parent
