@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Procfs2
-  class ProcNetTcpSocket
+  class ProcNetUdpSocket
     HEADERS = %i[
       id
       local_address_port
@@ -15,17 +15,13 @@ module Procfs2
       inode
       socket_reference_count
       socket_location
-      retransmit_timeout
-      soft_clock_predicted_tick
-      ack_pingpong
-      sending_congestion_window
-      slow_start_size_threshold
+      drops
     ].freeze
 
     STATE_STR = {
       0 => 'UNKNOWN',
       1 => 'ESTABLISHED',
-      2 => 'SYN',
+      2 => 'SYN_SENT',
       3 => 'SYN_RECV',
       4 => 'FIN_WAIT1',
       5 => 'FIN_WAIT2',
@@ -40,10 +36,10 @@ module Procfs2
     }.freeze
 
     attr_reader :id, :local_address, :local_port, :remote_address, :remote_port, :state,
-                :transmit_queue, :receive_queue, :uid, :inode
+                :transmit_queue, :receive_queue, :uid, :inode, :drops
 
     def initialize(id:, local_address:, local_port:, remote_address:, remote_port:, state:,
-                   transmit_queue:, receive_queue:, uid:, inode:, **extra)
+                   transmit_queue:, receive_queue:, uid:, inode:, drops:, **extra)
       @id = id
       @local_address = local_address
       @local_port = local_port
@@ -54,12 +50,13 @@ module Procfs2
       @receive_queue = receive_queue
       @uid = uid
       @inode = inode
+      @drops = drops
 
       @extra = extra
     end
 
     def type
-      'tcp'
+      'udp'
     end
 
     def state_str
@@ -83,11 +80,7 @@ module Procfs2
         options[:inode] = info[:inode].to_i
         options[:socket_reference_count] = info[:socket_reference_count].to_i
         options[:socket_location] = info[:socket_location]
-        options[:retransmit_timeout] = info[:retransmit_timeout].to_i
-        options[:soft_clock_predicted_tick] = info[:soft_clock_predicted_tick].to_i
-        options[:ack_pingpong] = info[:ack_pingpong].to_i
-        options[:sending_congestion_window] = info[:sending_congestion_window].to_i
-        options[:slow_start_size_threshold] = info[:slow_start_size_threshold].to_i
+        options[:drops] = info[:drops].to_i
 
         new(**options)
       end

@@ -40,11 +40,19 @@ module Procfs2
 
     def _parse_content; end
 
-    def method_missing(method_name, *args, **kwargs)
-      return unless _data
+    def method_missing(method, *args, **kwargs)
+      if _data.respond_to?(:key?)
+        return _data[method.to_sym] if _data.key?(method.to_sym)
+        return _data[method.to_s] if _data.key?(method.to_s)
+      end
 
-      return _data[method_name.to_sym] if _data.key?(method_name.to_sym)
-      return _data[method_name.to_s] if _data.key?(method_name.to_s)
+      super
+    end
+
+    def respond_to_missing?(method, *)
+      if _data.respond_to?(:key?) && (_data.key?(method.to_sym) || _data.key?(method.to_s))
+        return True
+      end
 
       super
     end
