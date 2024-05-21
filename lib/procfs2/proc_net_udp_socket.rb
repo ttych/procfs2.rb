@@ -88,9 +88,9 @@ module Procfs2
       def parse_address_hex(address_port_hex)
         address_hex, port_hex = address_port_hex.split(':')
         address = [address_hex[6..7],
-                   address_hex[5..4],
-                   address_hex[3..2],
-                   address_hex[1..0]].map(&:hex).join('.')
+                   address_hex[4..5],
+                   address_hex[2..3],
+                   address_hex[0..1]].map(&:hex).join('.')
         port = port_hex.hex
         [address, port]
       end
